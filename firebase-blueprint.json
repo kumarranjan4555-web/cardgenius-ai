@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "UserSelection": {
+      "title": "User Selection",
+      "description": "Stores user inputs for credit card selection",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "monthlyIncome": { "type": "number" },
+        "spendingCategories": { "type": "object" },
+        "city": { "type": "string" },
+        "recommendedCards": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "monthlyIncome", "spendingCategories", "city", "createdAt"]
+    },
+    "SpendAnalysis": {
+      "title": "Spend Analysis",
+      "description": "Stores user monthly expenses and analysis results",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "expenses": { "type": "object" },
+        "bestCard": { "type": "string" },
+        "monthlySavings": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "expenses", "bestCard", "monthlySavings", "createdAt"]
+    },
+    "EligibilityCheck": {
+      "title": "Eligibility Check",
+      "description": "Stores user eligibility check inputs and results",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "income": { "type": "number" },
+        "jobType": { "type": "string" },
+        "cibilScore": { "type": "number" },
+        "approvalChance": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "income", "jobType", "cibilScore", "approvalChance", "createdAt"]
+    },
+    "AffiliateClick": {
+      "title": "Affiliate Click",
+      "description": "Stores affiliate link clicks",
+      "type": "object",
+      "properties": {
+        "cardId": { "type": "string" },
+        "applyUrl": { "type": "string" },
+        "uid": { "type": "string" },
+        "userAgent": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["cardId", "applyUrl", "uid", "userAgent", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/userSelections/{selectionId}": {
+      "schema": "UserSelection",
+      "description": "Collection of user card selections"
+    },
+    "/spendAnalyses/{analysisId}": {
+      "schema": "SpendAnalysis",
+      "description": "Collection of user spend analyses"
+    },
+    "/eligibilityChecks/{checkId}": {
+      "schema": "EligibilityCheck",
+      "description": "Collection of user eligibility checks"
+    },
+    "/affiliateClicks/{clickId}": {
+      "schema": "AffiliateClick",
+      "description": "Collection of affiliate link clicks"
+    }
+  }
+}

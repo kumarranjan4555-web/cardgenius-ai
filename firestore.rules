@@ -1,0 +1,150 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: userSelections
+    // Document ID: auto-generated
+    // Fields:
+    //   - uid: string (required) - owner's user ID
+    //   - email: string (required) - user's email
+    //   - monthlyIncome: number (required) - user's monthly income
+    //   - spendingCategories: map (required) - user's spending habits
+    //   - city: string (required) - user's city
+    //   - recommendedCards: list (required) - list of card IDs
+    //   - createdAt: timestamp (required) - creation time
+    //
+    // Collection: spendAnalyses
+    // Document ID: auto-generated
+    // Fields:
+    //   - uid: string (required) - owner's user ID
+    //   - expenses: map (required) - user's monthly expenses
+    //   - bestCard: string (required) - recommended card ID
+    //   - monthlySavings: number (required) - calculated monthly savings
+    //   - createdAt: timestamp (required) - creation time
+    //
+    // Collection: eligibilityChecks
+    // Document ID: auto-generated
+    // Fields:
+    //   - uid: string (required) - owner's user ID
+    //   - income: number (required) - user's income
+    //   - jobType: string (required) - salaried or self-employed
+    //   - cibilScore: number (required) - user's CIBIL score
+    //   - approvalChance: number (required) - calculated approval chance
+    //   - createdAt: timestamp (required) - creation time
+    //
+    // Collection: affiliateClicks
+    // Document ID: auto-generated
+    // Fields:
+    //   - cardId: string (required) - ID of the clicked card
+    //   - applyUrl: string (required) - URL of the affiliate link
+    //   - uid: string (required) - user ID or 'anonymous'
+    //   - userAgent: string (required) - user agent of the browser
+    //   - timestamp: timestamp (required) - time of the click
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.uid;
+    }
+
+    function uidUnchanged() {
+      return !('uid' in request.resource.data) || request.resource.data.uid == request.auth.uid;
+    }
+
+    function uidNotModified() {
+      return !('uid' in request.resource.data) || request.resource.data.uid == resource.data.uid;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // Domain Validators
+    function isValidUserSelection(data) {
+      return hasRequiredFields(['uid', 'email', 'monthlyIncome', 'spendingCategories', 'city', 'recommendedCards', 'createdAt']) &&
+             data.uid is string &&
+             data.email is string &&
+             data.monthlyIncome is number && data.monthlyIncome >= 0 &&
+             data.spendingCategories is map &&
+             data.city is string && data.city.size() > 0 && data.city.size() < 100 &&
+             data.recommendedCards is list &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidSpendAnalysis(data) {
+      return hasRequiredFields(['uid', 'expenses', 'bestCard', 'monthlySavings', 'createdAt']) &&
+             data.uid is string &&
+             data.expenses is map &&
+             data.bestCard is string &&
+             data.monthlySavings is number &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidEligibilityCheck(data) {
+      return hasRequiredFields(['uid', 'income', 'jobType', 'cibilScore', 'approvalChance', 'createdAt']) &&
+             data.uid is string &&
+             data.income is number && data.income >= 0 &&
+             data.jobType in ['salaried', 'self-employed'] &&
+             data.cibilScore is number && data.cibilScore >= 300 && data.cibilScore <= 900 &&
+             data.approvalChance is number &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidAffiliateClick(data) {
+      return hasRequiredFields(['cardId', 'applyUrl', 'uid', 'userAgent', 'timestamp']) &&
+             data.cardId is string &&
+             data.applyUrl is string &&
+             data.uid is string &&
+             data.userAgent is string &&
+             data.timestamp is timestamp;
+    }
+
+    // Rules
+    match /userSelections/{selectionId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidUserSelection(request.resource.data) && uidUnchanged();
+      allow update: if isDocOwner() && isValidUserSelection(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /spendAnalyses/{analysisId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidSpendAnalysis(request.resource.data) && uidUnchanged();
+      allow update: if isDocOwner() && isValidSpendAnalysis(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /eligibilityChecks/{checkId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidEligibilityCheck(request.resource.data) && uidUnchanged();
+      allow update: if isDocOwner() && isValidEligibilityCheck(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /affiliateClicks/{clickId} {
+      allow create: if isValidAffiliateClick(request.resource.data);
+      allow read, update, delete: if false; // Only allow creation
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+  }
+}
