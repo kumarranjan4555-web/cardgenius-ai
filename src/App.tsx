@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import CardSelector from './pages/CardSelector';
@@ -33,19 +33,21 @@ export default function App() {
     <ErrorBoundary>
       <Router>
         <div className="min-h-screen bg-[#0B0F0C] flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/selector" element={<CardSelector />} />
-              <Route path="/analyzer" element={<SpendAnalyzer />} />
-              <Route path="/eligibility" element={<EligibilityChecker />} />
-              <Route path="/charges" element={<ChargesDetector />} />
-              <Route path="/results" element={<Results />} />
-              <Route path="/blog" element={<Blog />} />
-            </Routes>
-          </main>
-          <Footer />
+          <Sidebar />
+          <div className="flex-1 flex flex-col min-w-0 md:pl-64">
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/selector" element={<CardSelector />} />
+                <Route path="/analyzer" element={<SpendAnalyzer />} />
+                <Route path="/eligibility" element={<EligibilityChecker />} />
+                <Route path="/charges" element={<ChargesDetector />} />
+                <Route path="/results" element={<Results />} />
+                <Route path="/blog" element={<Blog />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
           <Toaster theme="dark" position="bottom-right" />
         </div>
       </Router>

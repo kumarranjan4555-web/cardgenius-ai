@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { ShieldCheck, TrendingUp, AlertCircle, CheckCircle2, Info, Loader2 } from 'lucide-react';
+import { ShieldCheck, TrendingUp, AlertCircle, CheckCircle2, Info, Loader2, ArrowRight } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../utils/errorHandlers';
+import { CREDIT_CARDS } from '../constants';
 
 export default function EligibilityChecker() {
   const [loading, setLoading] = useState(false);
@@ -13,6 +14,7 @@ export default function EligibilityChecker() {
     cibil: 750
   });
   const [result, setResult] = useState<{ chance: number; status: string; color: string } | null>(null);
+  const [recommendedCards, setRecommendedCards] = useState<typeof CREDIT_CARDS>([]);
 
   const calculateEligibility = async () => {
     setLoading(true);
@@ -39,6 +41,18 @@ export default function EligibilityChecker() {
 
     const chance = Math.min(score, 99);
     setResult({ chance, status, color });
+
+    // Calculate recommended cards
+    const eligibleCards = CREDIT_CARDS.filter(card => income >= card.minIncome && cibil >= card.minCibil)
+      .sort((a, b) => b.minCibil - a.minCibil)
+      .slice(0, 3);
+    
+    // If no exact match, just show the easiest ones to get
+    if (eligibleCards.length === 0) {
+      setRecommendedCards([...CREDIT_CARDS].sort((a, b) => a.minCibil - b.minCibil).slice(0, 2));
+    } else {
+      setRecommendedCards(eligibleCards);
+    }
 
     if (auth.currentUser) {
       const path = 'eligibilityChecks';
@@ -202,6 +216,67 @@ export default function EligibilityChecker() {
           </div>
         </div>
       </div>
+
+      {result && recommendedCards.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-16 space-y-8"
+        >
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-bold text-white tracking-tight">Recommended Cards Based on Your Profile</h2>
+            <p className="text-gray-400">These cards have a high approval probability for you.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {recommendedCards.map((card, index) => (
+              <motion.div
+                key={card.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
+                className="bg-[#0B0F0C] rounded-3xl border border-white/5 shadow-xl overflow-hidden flex flex-col"
+              >
+                <div className="p-6 flex-1 flex flex-col items-center text-center space-y-4">
+                  <div className="h-24 w-full flex items-center justify-center mb-2">
+                    <img 
+                      src={card.image} 
+                      alt={card.name} 
+                      className="max-h-full object-contain drop-shadow-lg"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="text-emerald-400 text-xs font-bold uppercase tracking-widest">{card.bank}</p>
+                    <h3 className="text-xl font-bold text-white">{card.name}</h3>
+                  </div>
+
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4" />
+                    High Approval Chance
+                  </div>
+
+                  <p className="text-gray-400 text-sm flex-1">
+                    {card.benefits[0]}
+                  </p>
+                </div>
+
+                <div className="p-6 pt-0 mt-auto">
+                  <button 
+                    onClick={() => window.open(card.applyUrl, '_blank')}
+                    className="w-full bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold text-sm border border-white/10 transition-all flex items-center justify-center gap-2"
+                  >
+                    Apply Now
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

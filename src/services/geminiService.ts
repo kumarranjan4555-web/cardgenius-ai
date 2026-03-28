@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { CREDIT_CARDS } from "../constants";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function getRecommendedCards(income: number, spending: any, city: string) {
   const model = "gemini-3-flash-preview";
@@ -31,9 +31,9 @@ export async function getRecommendedCards(income: number, spending: any, city: s
       }
     });
 
-    // Enforce 1.5s max loading time
+    // Enforce 15s max loading time
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Timeout')), 1500)
+      setTimeout(() => reject(new Error('Timeout')), 15000)
     );
 
     const response = await Promise.race([apiCall, timeoutPromise]) as any;
