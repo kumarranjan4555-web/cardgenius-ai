@@ -12,6 +12,9 @@ export interface CreditCard {
   minCibil: number;
   applyUrl: string;
   image: string;
+  loungeAccess: string;
+  cashbackCap: string;
+  rewardRedemption: string;
 }
 
 export interface UserProfile {

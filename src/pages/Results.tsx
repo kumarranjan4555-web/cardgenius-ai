@@ -187,13 +187,16 @@ export default function Results() {
                   { label: 'Annual Fee', key: 'annualFee', prefix: '₹' },
                   { label: 'Interest Rate', key: 'interestRate', suffix: '% p.m.' },
                   { label: 'Late Payment Fee', key: 'latePaymentFee', prefix: '₹' },
-                  { label: 'Min. Income', key: 'minIncome', prefix: '₹' }
+                  { label: 'Min. Income', key: 'minIncome', prefix: '₹' },
+                  { label: 'Lounge Access', key: 'loungeAccess' },
+                  { label: 'Cashback Cap', key: 'cashbackCap' },
+                  { label: 'Reward Redemption', key: 'rewardRedemption' }
                 ].map((row, i) => (
                   <tr key={i} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
                     <td className="p-6 text-sm font-bold text-gray-400">{row.label}</td>
                     {recommendations.map(card => (
                       <td key={card.id} className="p-6 text-sm font-medium text-gray-300">
-                        {row.prefix}{card[row.key as keyof CreditCard] as number}{row.suffix}
+                        {row.prefix}{card[row.key as keyof CreditCard] as string | number}{row.suffix}
                       </td>
                     ))}
                   </tr>

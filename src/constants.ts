@@ -14,7 +14,10 @@ export const CREDIT_CARDS: CreditCard[] = [
     minIncome: 35000,
     minCibil: 750,
     applyUrl: 'https://www.hdfcbank.com/',
-    image: 'https://images.unsplash.com/photo-1540339832862-4745a9805ad0?auto=format&fit=crop&q=80&w=400&h=250'
+    image: 'https://images.unsplash.com/photo-1540339832862-4745a9805ad0?auto=format&fit=crop&q=80&w=400&h=250',
+    loungeAccess: '8 Domestic/year',
+    cashbackCap: '₹1000/month per category',
+    rewardRedemption: 'Cashback against statement balance'
   },
   {
     id: 'axis-indian-oil',
@@ -29,7 +32,10 @@ export const CREDIT_CARDS: CreditCard[] = [
     minIncome: 20000,
     minCibil: 700,
     applyUrl: 'https://www.axisbank.com/',
-    image: 'https://royalaiprompt.com/wp-content/uploads/2026/03/ChatGPT-Image-Mar-25-2026-10_08_03-PM.png'
+    image: 'https://royalaiprompt.com/wp-content/uploads/2026/03/ChatGPT-Image-Mar-25-2026-10_08_03-PM.png',
+    loungeAccess: 'None',
+    cashbackCap: '₹250/month on fuel',
+    rewardRedemption: 'Edge Reward Points'
   },
   {
     id: 'sbi-cashback',
@@ -44,7 +50,10 @@ export const CREDIT_CARDS: CreditCard[] = [
     minIncome: 30000,
     minCibil: 720,
     applyUrl: 'https://www.sbicard.com/',
-    image: 'https://picsum.photos/seed/sbi/400/250'
+    image: 'https://picsum.photos/seed/sbi/400/250',
+    loungeAccess: '4 Domestic/year',
+    cashbackCap: '₹5000/month',
+    rewardRedemption: 'Auto-credited to statement'
   },
   {
     id: 'axis-ace',
@@ -59,7 +68,10 @@ export const CREDIT_CARDS: CreditCard[] = [
     minIncome: 25000,
     minCibil: 700,
     applyUrl: 'https://www.axisbank.com/',
-    image: 'https://picsum.photos/seed/axis/400/250'
+    image: 'https://picsum.photos/seed/axis/400/250',
+    loungeAccess: '4 Domestic/year',
+    cashbackCap: '₹500/month on GPay',
+    rewardRedemption: 'Auto-credited to statement'
   },
   {
     id: 'icici-amazon-pay',
@@ -74,7 +86,10 @@ export const CREDIT_CARDS: CreditCard[] = [
     minIncome: 25000,
     minCibil: 720,
     applyUrl: 'https://www.icicibank.com/',
-    image: 'https://picsum.photos/seed/icici/400/250'
+    image: 'https://picsum.photos/seed/icici/400/250',
+    loungeAccess: 'None',
+    cashbackCap: 'No limit',
+    rewardRedemption: 'Amazon Pay Balance'
   }
 ];
 

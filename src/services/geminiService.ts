@@ -1,9 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { CREDIT_CARDS } from "../constants";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export async function getRecommendedCards(income: number, spending: any, city: string) {
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const model = "gemini-3-flash-preview";
   
   const prompt = `
@@ -21,14 +20,7 @@ export async function getRecommendedCards(income: number, spending: any, city: s
   try {
     const apiCall = ai.models.generateContent({
       model,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: { type: Type.STRING }
-        }
-      }
+      contents: prompt
     });
 
     // Enforce 15s max loading time
@@ -38,7 +30,11 @@ export async function getRecommendedCards(income: number, spending: any, city: s
 
     const response = await Promise.race([apiCall, timeoutPromise]) as any;
 
-    const cardIds = JSON.parse(response.text || "[]");
+    let text = response.text || "[]";
+    // Remove markdown code blocks if present
+    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    
+    const cardIds = JSON.parse(text);
     const recommended = CREDIT_CARDS.filter(card => cardIds.includes(card.id)).slice(0, 3);
     
     // If AI didn't return enough cards, fallback
